@@ -6,15 +6,17 @@ getpaper is a small command-line tool writen in python to **get scientific paper
 ## example
 
 ```bash
-$> getpaper PRA 46 2668
-$> getpaper Nature 519 211
-$> getpaper arxiv 1706 07781
+# general synthax :
+# $> getpaper journal_name volume page
+getpaper PRA 46 2668
+getpaper Nature 519 211
+getpaper arxiv 1706 07781
 ```
 
 to get the list of implemented journal :
 
 ```bash
-$> getpaper journals
+getpaper journals # returns list of journals
 
 available journals : PRL, PRX, RMP, PRA, PRB, PRC, PRD, PRE, PR, Science, NatPhys, Nature, arxiv, arXiv, NJP, JPBold, JPB, OE, OL, AO, Optica
 ```
