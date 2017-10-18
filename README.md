@@ -24,4 +24,14 @@ available journals : PRL, PRX, RMP, PRA, PRB, PRC, PRD, PRE, PR, Science, NatPhy
 
 So far, on top of broadband journals such as *Nature* or *Science* and the open-access *arXiv* repository, only a subset of **physics** journals is implemented.
 
-**If you wish to contribute, by writing the code in a more elegant way or implementing new journals, do not hesitate to contact me.** 
+**If you wish to contribute, by writing the code in a more elegant way or implementing new journals, do not hesitate to contact me.**
+
+## notes
+
+The script is written for **python 2.7**. It requires the installation of additionnal packages: 
+
+-  [requests](https://pypi.python.org/pypi/requests): "*Python HTTP for Humans.*" Used to send requests to the journal's search engine and retrieve information.
+
+- [beautifulsoup4](https://pypi.python.org/pypi/beautifulsoup4/): "*Beautiful Soup sits atop an HTML or XML parser, providing Pythonic idioms for iterating, searching, and modifying the parse tree.*" Used to parse the HTTP response.
+
+For a simple install, I recommend using pip (https://pypi.python.org/pypi/pip/).
