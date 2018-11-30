@@ -47,6 +47,9 @@ OSA_LIST = OSA_NAMES.keys()
 ALL_JOURNALS = APS_LIST + SCIENCE_LIST + NATURE_LIST + ARXIV_LIST + IOP_LIST \
                + OSA_LIST
 
+# OTHER VARIABLES
+AUTOTEST = False
+
 #%% Help string
 
 HELP_STRING = """
@@ -68,40 +71,55 @@ HELP_STRING = """
               $> getpaper journals : returns implemented journal list
            """
 
+#%% Useful functions
+def low_list(string_list):
+    return [s.lower() for s in string_list]
+
+def low_dict(dic):
+    return {key.lower() : value for key, value in dic.iteritems()}
+
 #%% Core functions
 def start():
     '''
     Will analyse input and act accordingly
     '''
     global ALL_JOURNALS, HELP_STRING
+    # if anything but "normal behaviour",do not go on
+    go_on = False
+
+    # -- wrong behaviour : no arguments or more than 3
     if len(sys.argv) == 1 or len(sys.argv) > 4:
         print(HELP_STRING)
-        go_on = False
+
+    # -- special behaviour : only one argument
     elif len(sys.argv) == 2:
         option = sys.argv[1]
-        if option == 'journals':
+        if option.lower() == 'journals':
             msg = 'available journals : '+ ', '.join(ALL_JOURNALS)
             print(msg)
+        elif option.lower() == 'autotest':
+            autotest()
         else:
             print(HELP_STRING)
-        go_on = False
+
+    # -- special behaviour : only two argument
     elif len(sys.argv) == 3:
         mode = sys.argv[1]
         option = sys.argv[2]
-        if mode == 'doi':
+        if mode.lower() == 'doi':
             get_DOI_reference(option)
-        elif mode == 'arxiv':
+        elif mode.lower() == 'arxiv':
             # when calling "getpaper arxiv 1706.07781"
             # instead of "getpaper arxiv 1706 07781"
             get_arxiv_direct(option)
         else:
             print(HELP_STRING)
-        go_on = False
-    else:
+
+    # -- normal behaviour : three arguments
+    elif len(sys.argv) == 4:
         go_on = True
 
     return go_on
-
 
 def get_paper_properties():
     global JOURNAL, ISSUE, PAGE, ALL_JOURNALS
@@ -114,29 +132,33 @@ def get_paper_properties():
     # check implemented journal
     err_msg = '%s is not an implemented journal'%JOURNAL
     err_msg += '\n' + 'available journals : ' + ', '.join(ALL_JOURNALS)
-    assert JOURNAL in ALL_JOURNALS, err_msg
+    JOURNAL = JOURNAL.lower()
+    assert JOURNAL in low_list(ALL_JOURNALS), err_msg
 
 def send_search_request():
     global JOURNAL, ISSUE, PAGE, APS_LIST, SCIENCE_LIST, NATURE_LIST, \
-           ARXIV_LIST, IOP_LIST, OSA_LIST
+           ARXIV_LIST, IOP_LIST, OSA_LIST, AUTOTEST
+    # to be on the safe side
+    JOURNAL = JOURNAL.lower()
     # get reference
-    if JOURNAL in APS_LIST:
+    if JOURNAL in low_list(APS_LIST):
         url = get_APS_reference()
-    elif JOURNAL in SCIENCE_LIST:
+    elif JOURNAL in low_list(SCIENCE_LIST):
         url = get_Science_reference()
-    elif JOURNAL in NATURE_LIST:
+    elif JOURNAL in low_list(NATURE_LIST):
         url = get_Nature_reference()
-    elif JOURNAL in ARXIV_LIST:
+    elif JOURNAL in low_list(ARXIV_LIST):
         url = get_arxiv_reference()
-    elif JOURNAL in IOP_LIST:
+    elif JOURNAL in low_list(IOP_LIST):
         url = get_IOP_reference()
-    elif JOURNAL in OSA_LIST:
+    elif JOURNAL in low_list(OSA_LIST):
         url = get_OSA_reference()
     else:
         url = 'https://scholar.google.com/'
     # print url and go there
     print(' >>> going to %s'%url)
-    webbrowser.open_new_tab(url)
+    if not AUTOTEST:
+        webbrowser.open_new_tab(url)
 
 #%% Paper retrieval functions
 def get_APS_reference():
@@ -204,16 +226,18 @@ def get_Nature_reference():
     '''
     global JOURNAL, ISSUE, PAGE, NATURE_NAMES
     url = 'https://www.nature.com/search'
-    data = {'journal':NATURE_NAMES[JOURNAL], 'order':'relevance',
+    names_dic = low_dict(NATURE_NAMES)
+    data = {'journal':names_dic[JOURNAL], 'order':'relevance',
             'volume':ISSUE, 'spage':PAGE}
     r = requests.get(url, params = data)
     if r.status_code == 200:
         soup = BeautifulSoup(r.text, 'lxml')
-        attrs = {'itemprop':'url','data-track-source':'search_result_rank_1'}
+        #attrs = {'itemprop':'url','data-track-source':'search_result_rank_1'}
+        attrs = {'itemprop':'url','data-track-label':'rank 0'}
         url = soup.find('a', attrs=attrs)
         if url != None:
             url = url['href']
-            pass
+            url = 'https://www.nature.com%s' % url
         else:
             print('Error : paper not found')
             url = r.url
@@ -240,7 +264,8 @@ def get_IOP_reference():
     iopscience.iop.org/findcontent). A selection is implemented (in IOP_NAMES)
     '''
     url = 'http://iopscience.iop.org/findcontent'
-    data = {'CF_JOURNAL':IOP_NAMES[JOURNAL], 'CF_VOLUME':ISSUE, 'CF_ISSUE':'',
+    names_dic = low_dict(IOP_NAMES)
+    data = {'CF_JOURNAL':names_dic[JOURNAL], 'CF_VOLUME':ISSUE, 'CF_ISSUE':'',
             'CF_PAGE':PAGE, 'submit':'Go', 'navsubmit':'Go'}
     r = requests.get(url, params = data)
     url = r.url
@@ -255,7 +280,8 @@ def get_OSA_reference():
     '''
     global JOURNAL, ISSUE, PAGE, OSA_NAMES
     url = 'https://www.osapublishing.org/search.cfm'
-    data = {'j':OSA_NAMES[JOURNAL], 'q':'', 'i':'',
+    names_dic = low_dict(OSA_NAMES)
+    data = {'j':names_dic[JOURNAL], 'q':'', 'i':'',
             'v':ISSUE, 'p':PAGE}
 
     params = [k + '=' + str(v) for k, v in data.iteritems() ]
@@ -280,6 +306,31 @@ def get_arxiv_direct(ref):
     url = 'https://arxiv.org/abs/%s' % ref
     print(' >>> going to %s'%url)
     webbrowser.open_new_tab(url)
+
+def autotest():
+    '''
+    auto test function
+    '''
+    global JOURNAL, ISSUE, PAGE, AUTOTEST
+    print('### Starting getpaper autotest')
+    # set AUTOTEST to True : not opening sucessfull request in browser
+    AUTOTEST = True
+    # definitions
+    paper_list = []
+    paper_list.append(('PRL', '48', '596'))
+    paper_list.append(('PRA', '5', '2217'))
+    paper_list.append(('RMP', '40', '677'))
+    paper_list.append(('arxiv', '1706', '07781'))
+    paper_list.append(('Nature', '415', '39'))
+    paper_list.append(('NatPhys', '1', '23'))
+    paper_list.append(('NJP', '12', '033007'))
+    paper_list.append(('OL', '21', '1777'))
+    # start test
+    for paper in paper_list:
+        JOURNAL, ISSUE, PAGE = paper
+        print(' $> getpaper %s %s %s' % (JOURNAL, ISSUE, PAGE))
+        send_search_request()
+        print(' ')
 
 #%% Main
 def main():
