@@ -90,6 +90,10 @@ def start():
         option = sys.argv[2]
         if mode == 'doi':
             get_DOI_reference(option)
+        elif mode == 'arxiv':
+            # when calling "getpaper arxiv 1706.07781"
+            # instead of "getpaper arxiv 1706 07781"
+            get_arxiv_direct(option)
         else:
             print(HELP_STRING)
         go_on = False
@@ -265,7 +269,6 @@ def get_OSA_reference():
 
 #%% Other functions
 def get_DOI_reference(doi):
-    global JOURNAL, ISSUE, PAGE
     '''
     this one is also quite easy
     '''
@@ -273,6 +276,10 @@ def get_DOI_reference(doi):
     print(' >>> going to %s'%url)
     webbrowser.open_new_tab(url)
 
+def get_arxiv_direct(ref):
+    url = 'https://arxiv.org/abs/%s' % ref
+    print(' >>> going to %s'%url)
+    webbrowser.open_new_tab(url)
 
 #%% Main
 def main():
