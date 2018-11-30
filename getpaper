@@ -9,7 +9,7 @@ Comments: a small command-line tool to get papers from their references. It
           formatted request, and scraps the answer (using BeautifulSoup) to get
           the paper url. If a paper is found, it opens its url on a new tab in
           the web browser. If there is an error, it opens the paper search page
-          
+
           Example :
               $> getpaper PRA 46 2668
               $> getpaper Nature 519 211
@@ -31,7 +31,7 @@ PAGE = '2668'
 # list of available journals
 APS_LIST = ['PRL', 'PRX', 'RMP', 'PRA', 'PRB', 'PRC', 'PRD', 'PRE', 'PR']
 SCIENCE_LIST = ['Science']
-ARXIV_LIST = ['arxiv', 'arXiv']
+ARXIV_LIST = ['arxiv']
 
 NATURE_NAMES = {'Nature':'nature', 'NatPhys':'nphys'}
 NATURE_LIST = NATURE_NAMES.keys()
@@ -55,37 +55,50 @@ HELP_STRING = """
           formatted request, and scraps the answer (using BeautifulSoup) to get
           the paper url. If a paper is found, it opens its url on a new tab in
           the web browser. If there is an error, it opens the paper search page
-          
+
           Example :
               $> getpaper PRA 46 2668
               $> getpaper Nature 519 211
-              $> getpaper arxiv 1706 07781 
-              
+              $> getpaper arxiv 1706 07781
+
+          Get paper using DOI :
+              $> getpaper doi 10.1103/physrevx.8.031054
+
           Other options :
               $> getpaper journals : returns implemented journal list
            """
-              
+
 #%% Core functions
 def start():
     '''
     Will analyse input and act accordingly
     '''
     global ALL_JOURNALS, HELP_STRING
-    if len(sys.argv)==1 or len(sys.argv) > 4:
+    if len(sys.argv) == 1 or len(sys.argv) > 4:
         print(HELP_STRING)
-        out = False
-    elif len(sys.argv)==2:
+        go_on = False
+    elif len(sys.argv) == 2:
         option = sys.argv[1]
         if option == 'journals':
             msg = 'available journals : '+ ', '.join(ALL_JOURNALS)
             print(msg)
-        out = False
+        else:
+            print(HELP_STRING)
+        go_on = False
+    elif len(sys.argv) == 3:
+        mode = sys.argv[1]
+        option = sys.argv[2]
+        if mode == 'doi':
+            get_DOI_reference(option)
+        else:
+            print(HELP_STRING)
+        go_on = False
     else:
-        out = True
-        
-    return out
-    
-    
+        go_on = True
+
+    return go_on
+
+
 def get_paper_properties():
     global JOURNAL, ISSUE, PAGE, ALL_JOURNALS
     # check number of inputs
@@ -98,7 +111,7 @@ def get_paper_properties():
     err_msg = '%s is not an implemented journal'%JOURNAL
     err_msg += '\n' + 'available journals : ' + ', '.join(ALL_JOURNALS)
     assert JOURNAL in ALL_JOURNALS, err_msg
-    
+
 def send_search_request():
     global JOURNAL, ISSUE, PAGE, APS_LIST, SCIENCE_LIST, NATURE_LIST, \
            ARXIV_LIST, IOP_LIST, OSA_LIST
@@ -114,17 +127,17 @@ def send_search_request():
     elif JOURNAL in IOP_LIST:
         url = get_IOP_reference()
     elif JOURNAL in OSA_LIST:
-        url = get_OSA_reference() 
+        url = get_OSA_reference()
     else:
-        url = 'https://scholar.google.com/'  
+        url = 'https://scholar.google.com/'
     # print url and go there
     print(' >>> going to %s'%url)
     webbrowser.open_new_tab(url)
-        
+
 #%% Paper retrieval functions
 def get_APS_reference():
     '''
-    The search server (https://journals.aps.org/search/citation) only takes 
+    The search server (https://journals.aps.org/search/citation) only takes
     posts requests (does not return anything otherwise). It directly sends us
     to the paper's page.
     '''
@@ -155,7 +168,7 @@ def get_Science_reference():
     '''
     global ISSUE, PAGE
     url = 'http://science.sciencemag.org/search/'
-    data = {'numresults':10, 'sort':'relevance-rank', 
+    data = {'numresults':10, 'sort':'relevance-rank',
             'format_result':'standard',
             'volume':ISSUE, 'firstpage':PAGE}
     params = [k + '%3A' + str(v) for k, v in data.iteritems() ]
@@ -176,7 +189,7 @@ def get_Science_reference():
         print('Error : %i'%r.status_code)
         print(r.reason)
         url = r.url
-    
+
     return url
 
 def get_Nature_reference():
@@ -187,7 +200,7 @@ def get_Nature_reference():
     '''
     global JOURNAL, ISSUE, PAGE, NATURE_NAMES
     url = 'https://www.nature.com/search'
-    data = {'journal':NATURE_NAMES[JOURNAL], 'order':'relevance', 
+    data = {'journal':NATURE_NAMES[JOURNAL], 'order':'relevance',
             'volume':ISSUE, 'spage':PAGE}
     r = requests.get(url, params = data)
     if r.status_code == 200:
@@ -205,7 +218,7 @@ def get_Nature_reference():
         print(r.reason)
         url = r.url
     return url
-    
+
 def get_arxiv_reference():
     global JOURNAL, ISSUE, PAGE
     '''
@@ -213,7 +226,7 @@ def get_arxiv_reference():
     '''
     url = 'https://arxiv.org/abs/%s.%s'%(ISSUE, PAGE)
     return url
- 
+
 
 def get_IOP_reference():
     global JOURNAL, ISSUE, PAGE, IOP_NAMES
@@ -233,14 +246,14 @@ def get_OSA_reference():
     '''
     for OSA papers we call the server (https://www.osapublishing.org/search.cfm)
     with a get request. Here the search page takes time to return a result, so
-    we directly open it in the browser.. 
+    we directly open it in the browser..
     #FIXME: find a way to wait for the result ?
     '''
     global JOURNAL, ISSUE, PAGE, OSA_NAMES
     url = 'https://www.osapublishing.org/search.cfm'
-    data = {'j':OSA_NAMES[JOURNAL], 'q':'', 'i':'', 
+    data = {'j':OSA_NAMES[JOURNAL], 'q':'', 'i':'',
             'v':ISSUE, 'p':PAGE}
-            
+
     params = [k + '=' + str(v) for k, v in data.iteritems() ]
     params = '&'.join(params)
     url = url + '?' + params
@@ -248,13 +261,25 @@ def get_OSA_reference():
     r = requests.get(url, params = data, allow_redirects=True,
                      stream=True, timeout=None)
     '''
-    return url  
+    return url
+
+#%% Other functions
+def get_DOI_reference(doi):
+    global JOURNAL, ISSUE, PAGE
+    '''
+    this one is also quite easy
+    '''
+    url = 'https://doi.org/%s' % doi
+    print(' >>> going to %s'%url)
+    webbrowser.open_new_tab(url)
+
+
 #%% Main
 def main():
     if start():
         get_paper_properties()
         send_search_request()
-    
+
 #%% Execute
 if __name__ == '__main__':
     main()
