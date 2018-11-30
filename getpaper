@@ -44,8 +44,10 @@ OSA_NAMES = {'OL':'ol', # optics letters
              'Optica':'optica', 'AO':'ao'}
 OSA_LIST = OSA_NAMES.keys()
 
+SCIPOST_PHYS_LIST = ['SPP', 'SciPostPhys']
+
 ALL_JOURNALS = APS_LIST + SCIENCE_LIST + NATURE_LIST + ARXIV_LIST + IOP_LIST \
-               + OSA_LIST
+               + OSA_LIST + SCIPOST_PHYS_LIST
 
 # OTHER VARIABLES
 AUTOTEST = False
@@ -137,7 +139,7 @@ def get_paper_properties():
 
 def send_search_request():
     global JOURNAL, ISSUE, PAGE, APS_LIST, SCIENCE_LIST, NATURE_LIST, \
-           ARXIV_LIST, IOP_LIST, OSA_LIST, AUTOTEST
+           ARXIV_LIST, IOP_LIST, OSA_LIST, SCIPOST_PHYS_LIST, AUTOTEST
     # to be on the safe side
     JOURNAL = JOURNAL.lower()
     # get reference
@@ -153,6 +155,8 @@ def send_search_request():
         url = get_IOP_reference()
     elif JOURNAL in low_list(OSA_LIST):
         url = get_OSA_reference()
+    elif JOURNAL in low_list(SCIPOST_PHYS_LIST):
+        url = get_SciPostPhys_reference()
     else:
         url = 'https://scholar.google.com/'
     # print url and go there
@@ -293,6 +297,31 @@ def get_OSA_reference():
     '''
     return url
 
+def get_SciPostPhys_reference():
+    '''
+    Scipost Physics reference
+    '''
+    global JOURNAL, ISSUE, PAGE
+    url = 'https://scipost.org/search'
+    data = {'q' : 'SciPost Phys %s %s' % (ISSUE, PAGE) }
+    r = requests.get(url, params = data)
+    if r.status_code == 200:
+        soup = BeautifulSoup(r.text, 'lxml')
+        attrs =  {'class':'py-0'}
+        paper = soup.find('h3', attrs=attrs)
+        if paper != None:
+            href = paper.a.attrs['href']
+            url = 'https://scipost.org%s' % href
+        else:
+            print('Error : paper not found')
+            url = r.url
+        pass
+    else:
+        print('Error : %i'%r.status_code)
+        print(r.reason)
+        url = r.url
+    return url
+
 #%% Other functions
 def get_DOI_reference(doi):
     '''
@@ -325,6 +354,7 @@ def autotest():
     paper_list.append(('NatPhys', '1', '23'))
     paper_list.append(('NJP', '12', '033007'))
     paper_list.append(('OL', '21', '1777'))
+    paper_list.append(('SciPostPhys', '5', '055'))
     # start test
     for paper in paper_list:
         JOURNAL, ISSUE, PAGE = paper
