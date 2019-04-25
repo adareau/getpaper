@@ -307,7 +307,7 @@ def get_SciPostPhys_reference():
     r = requests.get(url, params = data)
     if r.status_code == 200:
         soup = BeautifulSoup(r.text, 'lxml')
-        attrs =  {'class':'py-0'}
+        attrs =  {'class':'my-0'}
         paper = soup.find('h3', attrs=attrs)
         if paper != None:
             href = paper.a.attrs['href']
