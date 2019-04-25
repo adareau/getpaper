@@ -2,3 +2,4 @@ HTTP_requests_examples.txt
 getpaper_tests.py
 iop_journals.txt
 test.html
+*.sublime-*
