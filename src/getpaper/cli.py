@@ -207,37 +207,20 @@ def get_APS_reference():
 
 def get_Science_reference():
     """
-    for some strange reason, the search server (science.sciencemag.org/search/)
-    does not receive its arguments via a get or a post request. So we have to
-    concatenate the research 'by hand', in the form 'argument%3Avalue', whith
-    white space as a separator.
+    The search page is loaded dynamically, so I do not try to get
+    the data from the page
     """
     global ISSUE, PAGE
-    url = "http://science.sciencemag.org/search/"
+    url = "https://www.science.org/action/doSearch"
     data = {
-        "numresults": 10,
-        "sort": "relevance-rank",
-        "format_result": "standard",
-        "volume": ISSUE,
-        "firstpage": PAGE,
+        "SeriesKey": "science",
+        "quickLinkJournal": "science",
+        "Volume": ISSUE,
+        "FirstPage": PAGE,
     }
-    params = [k + "%3A" + str(v) for k, v in data.items()]
-    params = " ".join(params)
-    r = requests.get(url + params)
-    if r.status_code == 200:
-        soup = BeautifulSoup(r.text, "lxml")
-        attrs = {"class": "highwire-cite-linked-title", "data-hide-link-title": 0}
-        url = soup.find("a", attrs=attrs)
-        if url != None:
-            url = "http://science.sciencemag.org" + url["href"]
-            pass
-        else:
-            print("Error : paper not found")
-            url = r.url
-    else:
-        print("Error : %i" % r.status_code)
-        print(r.reason)
-        url = r.url
+    params = [k + "=" + str(v) for k, v in data.items()]
+    params = "&".join(params)
+    url = url + "?" + params
 
     return url
 
