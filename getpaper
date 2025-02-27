@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 File    : getpaper
@@ -34,15 +34,15 @@ SCIENCE_LIST = ['Science']
 ARXIV_LIST = ['arxiv']
 
 NATURE_NAMES = {'Nature':'nature', 'NatPhys':'nphys'}
-NATURE_LIST = NATURE_NAMES.keys()
+NATURE_LIST = list(NATURE_NAMES.keys())
 
 IOP_NAMES = {'JPBold':'0022-3700', 'JPB':'0953-4075', 'NJP':'1367-2630'}
-IOP_LIST = IOP_NAMES.keys()
+IOP_LIST = list(IOP_NAMES.keys())
 
 OSA_NAMES = {'OL':'ol', # optics letters
              'OE':'oe', # optics express
              'Optica':'optica', 'AO':'ao'}
-OSA_LIST = OSA_NAMES.keys()
+OSA_LIST = list(OSA_NAMES.keys())
 
 SCIPOST_PHYS_LIST = ['SPP', 'SciPostPhys']
 
@@ -78,7 +78,7 @@ def low_list(string_list):
     return [s.lower() for s in string_list]
 
 def low_dict(dic):
-    return {key.lower() : value for key, value in dic.iteritems()}
+    return {key.lower() : value for key, value in dic.items()}
 
 #%% Core functions
 def start():
@@ -201,7 +201,7 @@ def get_Science_reference():
     data = {'numresults':10, 'sort':'relevance-rank',
             'format_result':'standard',
             'volume':ISSUE, 'firstpage':PAGE}
-    params = [k + '%3A' + str(v) for k, v in data.iteritems() ]
+    params = [k + '%3A' + str(v) for k, v in data.items() ]
     params = ' '.join(params)
     r = requests.get(url + params)
     if r.status_code == 200:
@@ -288,7 +288,7 @@ def get_OSA_reference():
     data = {'j':names_dic[JOURNAL], 'q':'', 'i':'',
             'v':ISSUE, 'p':PAGE}
 
-    params = [k + '=' + str(v) for k, v in data.iteritems() ]
+    params = [k + '=' + str(v) for k, v in data.items() ]
     params = '&'.join(params)
     url = url + '?' + params
     '''
