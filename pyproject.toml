@@ -1,5 +1,5 @@
 [project]
-name = "get-paper"
+name = "paper-retriever"
 version = "0.1.0"
 description = "a small command-line tool to get scientific papers from their references"
 authors = [
