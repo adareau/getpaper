@@ -1,6 +1,6 @@
 [project]
 name = "paper-retriever"
-version = "0.1.0"
+version = "0.1.1"
 description = "a small command-line tool to get scientific papers from their references"
 authors = [
     {name = "Alexandre Dareau",email = "alexandre.dareau@protonmail.com"}
