@@ -16,9 +16,6 @@ dependencies = [
     "beautifulsoup4 (>=4.13.3,<5.0.0)",
     "lxml (>=5.3.1,<6.0.0)"
 ]
-packages = [
-    { include = "getpaper", from = "src" },
-]
 
 [project.urls]
 Homepage = "https://github.com/adareau/getpaper"
@@ -30,7 +27,7 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [project.scripts]
-getpaper = 'getpaper.cli:app'
+getpaper = 'get-paper.cli:app'
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
