@@ -399,7 +399,7 @@ def autotest():
 
 
 # % Main
-def main():
+def app():
     if start():
         get_paper_properties()
         send_search_request()
@@ -407,4 +407,4 @@ def main():
 
 # % Execute
 if __name__ == "__main__":
-    main()
+    app()
