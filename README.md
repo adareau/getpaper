@@ -7,6 +7,9 @@ getpaper is a small command-line tool writen in python to **get scientific paper
 ![](example-PRA.gif)
 
 ## installation
+
+https://pypi.org/project/paper-retriever/
+
 ```bash
 $ pip install paper-retriever
 ```
