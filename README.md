@@ -1,9 +1,18 @@
 # getpaper
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ## description
 getpaper is a small command-line tool writen in python to **get scientific papers from their references**. It uses the journals' search engine, automatically send to them a well formatted request, and scraps the answer (using BeautifulSoup) to get the paper url. If a paper is found, it opens its url on a new tab in the web browser. If there is an error, it opens the paper search page.
 
 ![](example-PRA.gif)
+
+## installation
+
+https://pypi.org/project/paper-retriever/
+
+```bash
+$ pip install paper-retriever
+```
 
 ## example
 
@@ -34,7 +43,7 @@ Note that the papers are fetched from journals' search engine using web scrappin
 
 ## notes
 
-The script is written for **python 2.7**. It requires the installation of additionnal packages: 
+The script is written for **python >3.12**. It requires the installation of additionnal packages:
 
 -  [requests](https://pypi.python.org/pypi/requests): "*Python HTTP for Humans.*" Used to send requests to the journal's search engine and retrieve information.
 
