@@ -15,14 +15,14 @@ Comments: a small command-line tool to get papers from their references. It
               $> getpaper Nature 519 211
               $> getpaper arxiv 1706 07781
 """
-# %% Imports
+# % Imports
 import requests
 import webbrowser
 import sys
 
 from bs4 import BeautifulSoup
 
-# %% Global Variables
+# % Global Variables
 # paper reference initialization
 JOURNAL = "PRA"
 ISSUE = "46"
@@ -62,7 +62,7 @@ ALL_JOURNALS = (
 # OTHER VARIABLES
 AUTOTEST = False
 
-# %% Help string
+# % Help string
 
 HELP_STRING = """
           a small command-line tool to get papers from their references. It
@@ -84,7 +84,7 @@ HELP_STRING = """
            """
 
 
-# %% Useful functions
+# % Useful functions
 def low_list(string_list):
     return [s.lower() for s in string_list]
 
@@ -93,7 +93,7 @@ def low_dict(dic):
     return {key.lower(): value for key, value in dic.items()}
 
 
-# %% Core functions
+# % Core functions
 def start():
     """
     Will analyse input and act accordingly
@@ -179,7 +179,7 @@ def send_search_request():
         webbrowser.open_new_tab(url)
 
 
-# %% Paper retrieval functions
+# % Paper retrieval functions
 def get_APS_reference():
     """
     The search server (https://journals.aps.org/search/citation) only takes
@@ -355,7 +355,7 @@ def get_SciPostPhys_reference():
     return url
 
 
-# %% Other functions
+# % Other functions
 def get_DOI_reference(doi):
     """
     this one is also quite easy
@@ -398,13 +398,13 @@ def autotest():
         print(" ")
 
 
-# %% Main
+# % Main
 def main():
     if start():
         get_paper_properties()
         send_search_request()
 
 
-# %% Execute
+# % Execute
 if __name__ == "__main__":
     main()
