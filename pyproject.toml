@@ -1,0 +1,26 @@
+[project]
+name = "getpaper"
+version = "0.1.0"
+description = "a small command-line tool to get scientific papers from their references"
+authors = [
+    {name = "Alexandre Dareau",email = "alexandre.dareau@protonmail.com"}
+]
+maintainers = [
+  {name = "Alexandre Dareau", email = "alexandre.dareau@protonmail.com"}
+]
+license = {text = "GPL-3.0-or-later"}
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "requests (>=2.32.3,<3.0.0)",
+    "beautifulsoup4 (>=4.13.3,<5.0.0)"
+]
+
+[project.urls]
+Homepage = "https://github.com/adareau/getpaper"
+Repository = "https://github.com/adareau/getpaper.git"
+Issues = "https://github.com/adareau/getpaper/issues"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
