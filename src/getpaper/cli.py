@@ -260,8 +260,7 @@ def get_Nature_reference():
     r = requests.get(url, params=data)
     if r.status_code == 200:
         soup = BeautifulSoup(r.text, "lxml")
-        # attrs = {'itemprop':'url','data-track-source':'search_result_rank_1'}
-        attrs = {"itemprop": "url", "data-track-label": "rank 0"}
+        attrs = {"itemprop": "url", "data-track-action": "view article"}
         url = soup.find("a", attrs=attrs)
         if url != None:
             url = url["href"]
