@@ -29,7 +29,20 @@ ISSUE = "46"
 PAGE = "2668"
 
 # list of available journals
-APS_LIST = ["PRL", "PRX", "RMP", "PRA", "PRB", "PRC", "PRD", "PRE", "PR"]
+APS_NAMES_MATCH = {
+    "PRL": "PhysRevLett",
+    "PRX": "PhysRevX",
+    "RMP": "RevModPhys",
+    "PRA": "PhysRevA",
+    "PRB": "PhysRevB",
+    "PRC": "PhysRevC",
+    "PRD": "PhysRevD",
+    "PRE": "PhysRevE",
+    "PRR": "PhysRevResearch",
+    "PRApp": "PhysRevApplied",
+    "PRXQuantum": "PRXQuantum",
+}
+APS_LIST = list(APS_NAMES_MATCH)
 SCIENCE_LIST = ["Science"]
 ARXIV_LIST = ["arxiv"]
 
@@ -186,23 +199,10 @@ def get_APS_reference():
     posts requests (does not return anything otherwise). It directly sends us
     to the paper's page.
     """
-    global JOURNAL, ISSUE, PAGE
-    url = "https://journals.aps.org/search/citation"
-    data = {"journal": JOURNAL, "volume": ISSUE, "article": PAGE}
-    r = requests.post(url, data=data)
-    if r.status_code == 200:
-        soup = BeautifulSoup(r.text, "lxml")
-        url = soup.find("meta", property="og:url")
-        if url != None:
-            url = url["content"]
-        else:
-            print("Error : paper not found")
-            url = r.url
-    else:
-        print("Error : %i" % r.status_code)
-        print(r.reason)
-
-    return url
+    global JOURNAL, ISSUE, PAGE, APS_NAME_MATCH
+    url = "https://doi.org/10.1103/{journal_key}.{issue}.{page}"
+    journal_key = APS_NAMES_MATCH[JOURNAL.upper()]
+    return url.format(journal_key=journal_key, issue=ISSUE, page=PAGE)
 
 
 def get_Science_reference():
